@@ -1,0 +1,14 @@
+# Environment files — never commit secrets
+.env
+.env.local
+.env*.local
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Local dev server logs
+*.log
