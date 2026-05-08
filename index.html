@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InstallNest – Free EV Charger Installation Quotes Near You</title>
-  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="256x256" href="favicon.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -138,6 +138,19 @@
     }
     .nav-installer:hover { background: #E0E8FE; border-color: var(--blue); }
     .nav-installer:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+    .nav-register {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+      padding: 9px 18px;
+      border-radius: 8px;
+      background: var(--blue);
+      border: 1.5px solid var(--blue);
+      transition: background .15s, transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .15s;
+    }
+    .nav-register:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: var(--shadow-blue); }
+    .nav-register:active { transform: translateY(0); }
+    .nav-register:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
     .hamburger {
       display: none;
       flex-direction: column;
@@ -957,6 +970,8 @@
       .hamburger { display: flex; }
       .nav-logo-full { display: none; }
       .nav-logo-icon { display: flex; }
+      .nav-installer { font-size: 12px; padding: 7px 10px; }
+      .nav-register { font-size: 12px; padding: 7px 10px; }
       .accred-divider { display: none; }
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .footer-grid { grid-template-columns: 1fr; }
@@ -1009,9 +1024,19 @@
       border-radius: 12px !important;
     }
     .mobile-menu-installer-link:hover { background: #E0E8FE !important; }
+    .mobile-menu-register-link {
+      margin-top: 8px;
+      background: var(--blue) !important;
+      color: var(--white) !important;
+      font-weight: 700 !important;
+      border: 1.5px solid var(--blue) !important;
+      text-align: center;
+      border-radius: 12px !important;
+    }
+    .mobile-menu-register-link:hover { background: var(--blue-dark) !important; }
 
     /* ── Hero form card ──────────────────────────────────── */
-    .hero-form-wrap { margin-bottom: 60px; }
+    .hero-form-wrap { margin-bottom: 60px; scroll-margin-top: 80px; }
     .hero-form-card {
       background: rgba(255,255,255,.07);
       border: 1px solid rgba(255,255,255,.15);
@@ -1210,12 +1235,8 @@
           <span class="nav-logo-full">
             <img src="brand_assets/InstallNest Logo1.png" alt="InstallNest" />
           </span>
-          <span class="nav-logo-icon" aria-hidden="true">
-            <svg width="42" height="42" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="40" height="40" rx="9" fill="#EEF2FF"/>
-              <path d="M20 7L33 18V33H25.5V25H14.5V33H7V18L20 7Z" fill="#0B1728"/>
-              <path d="M22 14.5L16 24.5H21L17.5 33L26 22H21L23.5 14.5Z" fill="#2350F5"/>
-            </svg>
+          <span class="nav-logo-icon" aria-hidden="false">
+            <img src="brand_assets/Icon only (full colour).png" alt="InstallNest" style="height:44px;width:auto;" />
           </span>
         </a>
         <div class="nav-links" role="navigation" aria-label="Main navigation">
@@ -1224,6 +1245,7 @@
         </div>
         <div class="nav-actions">
           <a class="nav-installer" href="#waitlist">For installers</a>
+          <a class="nav-register" href="#register-form">Register</a>
           <div class="hamburger" id="hamburgerBtn" role="button" tabindex="0" aria-label="Open menu" aria-expanded="false">
             <span></span><span></span><span></span>
           </div>
@@ -1237,6 +1259,7 @@
     <a href="#how-it-works">How it works</a>
     <a href="#why-us">Why us</a>
     <a href="#waitlist" class="mobile-menu-installer-link">For installers</a>
+    <a href="#register-form" class="mobile-menu-register-link">Register</a>
   </div>
 
   <!-- ── Hero ────────────────────────────────────────────── -->
@@ -1302,7 +1325,7 @@
         </div>
 
         <!-- Hero sign-up form -->
-        <div class="hero-form-wrap">
+        <div class="hero-form-wrap" id="register-form">
           <div class="hero-form-card">
             <div class="hero-form-fields" id="heroFormFields">
               <div>
@@ -1675,25 +1698,27 @@
     /* ── Hamburger / mobile menu ── */
     var hamburger = document.getElementById('hamburgerBtn');
     var mobileMenu = document.getElementById('mobileMenu');
+    var navActions = document.querySelector('.nav-actions');
+
+    function setMenuOpen(open) {
+      mobileMenu.classList.toggle('open', open);
+      hamburger.classList.toggle('active', open);
+      hamburger.setAttribute('aria-expanded', String(open));
+      mobileMenu.setAttribute('aria-hidden', String(!open));
+      document.body.style.overflow = open ? 'hidden' : '';
+      navActions.querySelectorAll('.nav-installer, .nav-register').forEach(function(el) {
+        el.style.visibility = open ? 'hidden' : '';
+      });
+    }
+
     hamburger.addEventListener('click', function() {
-      var isOpen = mobileMenu.classList.contains('open');
-      mobileMenu.classList.toggle('open');
-      hamburger.classList.toggle('active');
-      hamburger.setAttribute('aria-expanded', String(!isOpen));
-      mobileMenu.setAttribute('aria-hidden', String(isOpen));
-      document.body.style.overflow = isOpen ? '' : 'hidden';
+      setMenuOpen(!mobileMenu.classList.contains('open'));
     });
     hamburger.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hamburger.click(); }
     });
     mobileMenu.querySelectorAll('a').forEach(function(link) {
-      link.addEventListener('click', function() {
-        mobileMenu.classList.remove('open');
-        hamburger.classList.remove('active');
-        hamburger.setAttribute('aria-expanded', 'false');
-        mobileMenu.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-      });
+      link.addEventListener('click', function() { setMenuOpen(false); });
     });
 
     /* ── Modal logic ── */
