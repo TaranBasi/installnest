@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InstallNest — Signups</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue: #2350F5;
+      --blue-dark: #1840D8;
+      --blue-light: #EEF2FF;
+      --cyan: #06B6D4;
+      --cyan-light: #E0F7FA;
+      --navy: #0B1728;
+      --white: #FFFFFF;
+      --grey-50: #F7F8FC;
+      --grey-100: #EDEEF4;
+      --grey-200: #D5D9E8;
+      --grey-400: #8C96B5;
+      --text: #0B1728;
+      --text-sub: #4A5675;
+      --shadow-sm: 0 2px 8px rgba(11,23,40,.07), 0 1px 2px rgba(11,23,40,.05);
+      --shadow-md: 0 6px 24px rgba(35,80,245,.11), 0 2px 8px rgba(11,23,40,.07);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--grey-50);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Lock screen ── */
+    #lock {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .lock-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: var(--shadow-md);
+      text-align: center;
+    }
+    .lock-logo { height: 48px; width: auto; margin: 0 auto 24px; display: block; }
+    .lock-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .lock-sub { font-size: 14px; color: var(--text-sub); margin-bottom: 28px; }
+    .lock-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--grey-200);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color .15s;
+    }
+    .lock-input:focus { border-color: var(--blue); }
+    .lock-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background .15s, transform .18s cubic-bezier(.34,1.56,.64,1);
+    }
+    .lock-btn:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .lock-btn:active { transform: translateY(0); }
+    .lock-error {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #EF4444;
+      display: none;
+    }
+
+    /* ── Dashboard ── */
+    #dashboard { display: none; }
+
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--grey-100);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-logo { height: 38px; width: auto; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .topbar-tag {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-sub);
+      background: var(--grey-100);
+      padding: 4px 10px;
+      border-radius: 100px;
+      letter-spacing: .02em;
+    }
+    .signout-btn {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sub);
+      background: none;
+      border: 1.5px solid var(--grey-200);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: color .15s, border-color .15s;
+    }
+    .signout-btn:hover { color: var(--text); border-color: var(--grey-400); }
+
+    .main { max-width: 1100px; margin: 0 auto; padding: 36px 24px 60px; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--white);
+      border-radius: 14px;
+      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-label { font-size: 12px; font-weight: 600; color: var(--text-sub); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 8px; }
+    .stat-value { font-size: 36px; font-weight: 700; color: var(--text); line-height: 1; }
+    .stat-card.customers .stat-value { color: var(--blue); }
+    .stat-card.installers .stat-value { color: var(--cyan); }
+
+    .table-wrap {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 20px 24px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--grey-100);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .table-title { font-size: 16px; font-weight: 700; color: var(--text); }
+    .filter-tabs { display: flex; gap: 6px; }
+    .filter-tab {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1.5px solid var(--grey-200);
+      background: var(--white);
+      color: var(--text-sub);
+      font-family: 'Inter', sans-serif;
+      transition: all .15s;
+    }
+    .filter-tab:hover { border-color: var(--blue); color: var(--blue); }
+    .filter-tab.active { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+    .filter-tab.active.installer { background: var(--cyan-light); border-color: var(--cyan); color: #0590AE; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 12px 20px;
+      background: var(--grey-50);
+      border-bottom: 1px solid var(--grey-100);
+    }
+    tbody tr { border-bottom: 1px solid var(--grey-100); transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--grey-50); }
+    td {
+      padding: 14px 20px;
+      font-size: 14px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 100px;
+      letter-spacing: .03em;
+    }
+    .badge-customer { background: var(--blue-light); color: var(--blue); }
+    .badge-installer { background: var(--cyan-light); color: #0590AE; }
+    .td-email { font-weight: 500; }
+    .td-postcode { color: var(--text-sub); font-size: 13px; }
+    .td-date { color: var(--text-sub); font-size: 13px; white-space: nowrap; }
+    .empty-row td { text-align: center; padding: 48px 20px; color: var(--text-sub); font-size: 14px; }
+
+    @media (max-width: 640px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .stats-row .stat-card:last-child { grid-column: 1 / -1; }
+      thead th:nth-child(4), td:nth-child(4) { display: none; }
+      .table-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Lock screen -->
+  <div id="lock">
+    <div class="lock-card">
+      <img class="lock-logo" src="brand_assets/icon-nav.png" alt="InstallNest" />
+      <div class="lock-title">InstallNest Signups</div>
+      <div class="lock-sub">Enter your admin password to continue</div>
+      <input class="lock-input" type="password" id="passwordInput" placeholder="Password" autocomplete="current-password" />
+      <button class="lock-btn" id="unlockBtn">Sign in</button>
+      <div class="lock-error" id="lockError">Incorrect password. Try again.</div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard">
+    <header class="topbar">
+      <img class="topbar-logo" src="brand_assets/InstallNest Logo1.png" alt="InstallNest" />
+      <div class="topbar-right">
+        <span class="topbar-tag">Signups Dashboard</span>
+        <button class="signout-btn" id="signoutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total signups</div>
+          <div class="stat-value" id="statTotal">—</div>
+        </div>
+        <div class="stat-card customers">
+          <div class="stat-label">Customers</div>
+          <div class="stat-value" id="statCustomers">—</div>
+        </div>
+        <div class="stat-card installers">
+          <div class="stat-label">Installers</div>
+          <div class="stat-value" id="statInstallers">—</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title">All signups</span>
+          <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="customer">Customers</button>
+            <button class="filter-tab installer" data-filter="installer">Installers</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Email</th>
+              <th>Postcode</th>
+              <th>Business</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="leadsBody">
+            <tr class="empty-row"><td colspan="5">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    var LEADS_URL = 'https://njsgalgzhpaviwvfdjko.supabase.co/functions/v1/get-leads';
+    var SESSION_KEY = 'in_admin_token';
+    var allLeads = [];
+    var activeFilter = 'all';
+
+    // ── Auth ──────────────────────────────────────────────────
+    var storedToken = sessionStorage.getItem(SESSION_KEY);
+    if (storedToken) showDashboard(storedToken);
+
+    document.getElementById('passwordInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('unlockBtn').click();
+    });
+
+    document.getElementById('unlockBtn').addEventListener('click', function() {
+      var pwd = document.getElementById('passwordInput').value.trim();
+      if (!pwd) return;
+      this.textContent = 'Checking…';
+      this.disabled = true;
+      fetchLeads(pwd).then(function(leads) {
+        if (leads === null) {
+          document.getElementById('lockError').style.display = 'block';
+          document.getElementById('unlockBtn').textContent = 'Sign in';
+          document.getElementById('unlockBtn').disabled = false;
+        } else {
+          sessionStorage.setItem(SESSION_KEY, pwd);
+          showDashboard(pwd, leads);
+        }
+      });
+    });
+
+    document.getElementById('signoutBtn').addEventListener('click', function() {
+      sessionStorage.removeItem(SESSION_KEY);
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('lock').style.display = 'flex';
+      document.getElementById('passwordInput').value = '';
+    });
+
+    // ── Data ──────────────────────────────────────────────────
+    function fetchLeads(token) {
+      return fetch(LEADS_URL, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      }).then(function(r) {
+        if (r.status === 401) return null;
+        return r.json().then(function(d) { return d.leads || []; });
+      }).catch(function() { return null; });
+    }
+
+    function showDashboard(token, leads) {
+      document.getElementById('lock').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      if (leads) {
+        allLeads = leads;
+        render();
+      } else {
+        fetchLeads(token).then(function(data) {
+          if (data === null) {
+            sessionStorage.removeItem(SESSION_KEY);
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('lock').style.display = 'flex';
+            return;
+          }
+          allLeads = data;
+          render();
+        });
+      }
+    }
+
+    // ── Filters ───────────────────────────────────────────────
+    document.querySelectorAll('.filter-tab').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-tab').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        activeFilter = this.dataset.filter;
+        render();
+      });
+    });
+
+    // ── Render ────────────────────────────────────────────────
+    function render() {
+      var customers = allLeads.filter(function(l) { return l.type === 'customer'; }).length;
+      var installers = allLeads.filter(function(l) { return l.type === 'installer'; }).length;
+      document.getElementById('statTotal').textContent = allLeads.length;
+      document.getElementById('statCustomers').textContent = customers;
+      document.getElementById('statInstallers').textContent = installers;
+
+      var filtered = activeFilter === 'all' ? allLeads : allLeads.filter(function(l) { return l.type === activeFilter; });
+      var tbody = document.getElementById('leadsBody');
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No signups yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(function(l) {
+        var date = new Date(l.created_at);
+        var dateStr = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        var timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        var postcode = l.nationwide ? 'Nationwide' : (l.postcode || '—');
+        var badgeClass = l.type === 'installer' ? 'badge-installer' : 'badge-customer';
+        var badgeLabel = l.type === 'installer' ? 'Installer' : 'Customer';
+        return '<tr>' +
+          '<td><span class="badge ' + badgeClass + '">' + badgeLabel + '</span></td>' +
+          '<td class="td-email">' + escHtml(l.email) + '</td>' +
+          '<td class="td-postcode">' + escHtml(postcode) + '</td>' +
+          '<td class="td-postcode">' + escHtml(l.business_name || '—') + '</td>' +
+          '<td class="td-date">' + dateStr + ' · ' + timeStr + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>

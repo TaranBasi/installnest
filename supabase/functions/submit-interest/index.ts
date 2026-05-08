@@ -52,6 +52,54 @@ serve(async (req) => {
     return respond({ error: 'Database error' }, 500)
   }
 
+  // Notify the InstallNest team of the new signup
+  const notifyHtml = `<!DOCTYPE html>
+  <html lang="en">
+  <head><meta charset="UTF-8" /></head>
+  <body style="margin:0;padding:0;background:#F1F1F3;font-family:'Inter',Arial,sans-serif">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#F1F1F3;padding:32px 16px">
+      <tr><td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
+          <tr><td style="background:${type === 'installer' ? '#06B6D4' : '#2350F5'};padding:20px 28px">
+            <p style="margin:0;color:#fff;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">
+              New ${type === 'installer' ? 'Installer' : 'Customer'} Signup
+            </p>
+          </td></tr>
+          <tr><td style="padding:24px 28px">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr><td style="padding:6px 0;font-size:14px;color:#64748b;width:120px">Email</td>
+                  <td style="padding:6px 0;font-size:14px;color:#0f172a;font-weight:600">${email.toLowerCase().trim()}</td></tr>
+              ${postcode ? `<tr><td style="padding:6px 0;font-size:14px;color:#64748b">Postcode</td>
+                  <td style="padding:6px 0;font-size:14px;color:#0f172a;font-weight:600">${nationwide ? 'Nationwide' : postcode.toUpperCase().trim()}</td></tr>` : ''}
+              ${business_name ? `<tr><td style="padding:6px 0;font-size:14px;color:#64748b">Business</td>
+                  <td style="padding:6px 0;font-size:14px;color:#0f172a;font-weight:600">${business_name.trim()}</td></tr>` : ''}
+              <tr><td style="padding:6px 0;font-size:14px;color:#64748b">Time</td>
+                  <td style="padding:6px 0;font-size:14px;color:#0f172a;font-weight:600">${new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' })}</td></tr>
+            </table>
+          </td></tr>
+          <tr><td style="background:#F8FAFC;padding:16px 28px;border-top:1px solid #e2e8f0;text-align:center">
+            <a href="https://installnest.com/admin.html"
+               style="font-size:13px;color:#2350F5;text-decoration:none;font-weight:600">View all signups →</a>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body></html>`
+
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')!}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'InstallNest Signups <noreply@installnest.com>',
+      to: 'taranbasi1@gmail.com',
+      subject: `New ${type === 'installer' ? 'installer' : 'customer'} signup — ${email.toLowerCase().trim()}`,
+      html: notifyHtml,
+    }),
+  }).catch(err => console.error('Notify email error:', err))
+
   // Build the thank-you email
   const subject = 'Thanks for your interest in InstallNest'
 
