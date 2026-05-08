@@ -3,8 +3,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'content-type, authorization',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 }
 
 function respond(data: unknown, status = 200) {
@@ -15,8 +15,26 @@ function respond(data: unknown, status = 200) {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
+
+  // ── Admin: GET /submit-interest → return all leads ──────────────────────
+  if (req.method === 'GET') {
+    const token = (req.headers.get('Authorization') ?? '').replace('Bearer ', '').trim()
+    if (!token || token !== Deno.env.get('ADMIN_TOKEN')) {
+      return respond({ error: 'Unauthorized' }, 401)
+    }
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    )
+    const { data, error } = await supabase
+      .from('leads')
+      .select('id, type, email, postcode, nationwide, business_name, created_at')
+      .order('created_at', { ascending: false })
+    if (error) return respond({ error: 'Database error' }, 500)
+    return respond({ leads: data })
+  }
+
   if (req.method !== 'POST') return respond({ error: 'Method not allowed' }, 405)
 
   const body = await req.json().catch(() => null)
