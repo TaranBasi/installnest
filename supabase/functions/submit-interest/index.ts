@@ -18,6 +18,19 @@ function respond(data: unknown, status = 200) {
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
+  // ── Public: GET ?count=1 → return customer signup count (no auth) ───────
+  if (req.method === 'GET' && new URL(req.url).searchParams.get('count') === '1') {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+    )
+    const { count } = await supabase
+      .from('leads')
+      .select('*', { count: 'exact', head: true })
+      .eq('type', 'customer')
+    return respond({ count: count ?? 0 })
+  }
+
   // ── Admin: GET /submit-interest → return all leads ──────────────────────
   if (req.method === 'GET') {
     const token = (req.headers.get('Authorization') ?? '').replace('Bearer ', '').trim()
