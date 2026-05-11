@@ -43,7 +43,7 @@ serve(async (req) => {
     )
     const { data, error } = await supabase
       .from('leads')
-      .select('id, type, email, postcode, nationwide, business_name, created_at')
+      .select('id, type, email, postcode, nationwide, business_name, utm_source, utm_medium, utm_campaign, referrer, created_at')
       .order('created_at', { ascending: false })
     if (error) return respond({ error: 'Database error' }, 500)
     return respond({ leads: data })
@@ -54,7 +54,7 @@ serve(async (req) => {
   const body = await req.json().catch(() => null)
   if (!body || !body.email || !body.type) return respond({ error: 'Missing required fields' }, 400)
 
-  const { type, email, postcode, nationwide, business_name } = body
+  const { type, email, postcode, nationwide, business_name, utm_source, utm_medium, utm_campaign, referrer } = body
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -77,6 +77,10 @@ serve(async (req) => {
     postcode: nationwide ? null : (postcode?.toUpperCase().trim() || null),
     nationwide: !!nationwide,
     business_name: business_name?.trim() || null,
+    utm_source: utm_source || null,
+    utm_medium: utm_medium || null,
+    utm_campaign: utm_campaign || null,
+    referrer: referrer || null,
   })
 
   if (dbErr) {

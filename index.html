@@ -34,6 +34,15 @@
     })(window, document, "clarity", "script", "wodqnff6t0");
   </script>
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PFQP5TY3WT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-PFQP5TY3WT');
+  </script>
+
   <!-- SEO: FAQ Structured Data -->
   <script type="application/ld+json">
   {
@@ -1965,6 +1974,17 @@
     ─────────────────────────────────────────────────────────────── */
     var SUBMIT_URL = 'https://njsgalgzhpaviwvfdjko.supabase.co/functions/v1/submit-interest';
 
+    /* ── Channel attribution: reads UTM params + referrer at time of submission ── */
+    function getTrackingData() {
+      var params = new URLSearchParams(window.location.search);
+      return {
+        utm_source:   params.get('utm_source')   || null,
+        utm_medium:   params.get('utm_medium')   || null,
+        utm_campaign: params.get('utm_campaign') || null,
+        referrer:     document.referrer          || null,
+      };
+    }
+
     /* ── Validation helpers ── */
     function isValidUKPostcode(val) {
       return /^[A-Z]{1,2}[0-9][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(val.trim());
@@ -1999,12 +2019,13 @@
       fetch(SUBMIT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'customer', email: email, postcode: postcode }),
+        body: JSON.stringify(Object.assign({ type: 'customer', email: email, postcode: postcode }, getTrackingData())),
       })
       .then(function(res) {
         return res.json().then(function(data) { return { status: res.status, data: data }; });
       })
       .then(function(result) {
+        if (typeof gtag !== 'undefined') gtag('event', 'sign_up', { user_type: 'customer' });
         if (result.data.duplicate) {
           document.getElementById('heroSuccessTitle').textContent = "You're already registered!";
           document.getElementById('heroSuccessMsg').textContent = "We already have your details — we'll be in touch soon.";
@@ -2131,18 +2152,19 @@
       fetch(SUBMIT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: JSON.stringify(Object.assign({
           type: 'installer',
           email: email,
           postcode: nationwide ? null : postcode,
           nationwide: nationwide,
           business_name: name,
-        }),
+        }, getTrackingData())),
       })
       .then(function(res) {
         return res.json().then(function(data) { return { status: res.status, data: data }; });
       })
       .then(function(result) {
+        if (typeof gtag !== 'undefined') gtag('event', 'sign_up', { user_type: 'installer' });
         if (result.data.duplicate) {
           document.getElementById('instSuccessTitle').textContent = "You're already registered!";
           document.getElementById('instSuccessMsg').textContent = "We already have your details — we'll be in touch soon.";
