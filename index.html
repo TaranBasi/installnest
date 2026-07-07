@@ -2034,6 +2034,7 @@
       })
       .then(function(result) {
         if (typeof gtag !== 'undefined') gtag('event', 'sign_up', { user_type: 'customer' });
+        if (typeof gtag !== 'undefined') gtag('event', 'conversion_event_signup', {});
         if (result.data.duplicate) {
           document.getElementById('heroSuccessTitle').textContent = "You're already registered!";
           document.getElementById('heroSuccessMsg').textContent = "We already have your details — we'll be in touch soon.";
