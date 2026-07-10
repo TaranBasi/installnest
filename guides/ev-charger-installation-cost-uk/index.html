@@ -563,13 +563,56 @@
       .footer-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 640px) {
+      /* Nav — just logo + Get quotes, no clutter */
       .nav-links { display: none; }
-      .hamburger { display: flex; }
+      .nav-installer { display: none; }
+      .hamburger { display: none; }
+      .nav-register { font-size: 13px; padding: 8px 14px; }
+
+      /* Hero */
+      .guide-hero { padding: 36px 0 32px; }
+      .breadcrumb { font-size: 12px; flex-wrap: wrap; }
+      .guide-hero h1 { font-size: clamp(24px, 7vw, 36px); }
+      .guide-hero-meta { gap: 14px; }
+
+      /* Article */
+      .article-wrap { padding: 28px 0 56px; gap: 32px; }
+      .article-body h2 { font-size: 19px; margin: 36px 0 12px; }
+      .article-body p, .article-body ul li { font-size: 14.5px; }
+
+      /* Stat cards */
       .stat-grid { grid-template-columns: 1fr; }
-      .cost-hero-box { padding: 24px 22px; }
-      .cost-hero-box-figure { font-size: 36px; }
-      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
-      .guide-hero { padding: 44px 0 40px; }
+      .stat-card-val { font-size: 22px; }
+
+      /* Cost highlight box */
+      .cost-hero-box { padding: 20px 18px; }
+      .cost-hero-box-figure { font-size: 32px; }
+
+      /* Cost table — bleed edge so it scrolls inside its own track */
+      .cost-table-wrap { margin-left: -24px; margin-right: -24px; padding: 0 24px; }
+      .cost-table { min-width: 500px; }
+      .cost-table th, .cost-table td { font-size: 12px; padding: 10px 10px; }
+
+      /* Callouts */
+      .callout { padding: 14px 16px; }
+      .callout p { font-size: 13px; }
+
+      /* Grant box */
+      .grant-box { padding: 20px 18px; }
+      .grant-box-amount { font-size: 28px; }
+      .grant-list-item { font-size: 13px; }
+
+      /* CTA */
+      .guide-cta { padding: 28px 20px; }
+      .guide-cta h2 { font-size: 20px !important; }
+      .guide-cta p { font-size: 14px; }
+      .guide-cta-btn { width: 100%; justify-content: center; }
+
+      /* Sidebar */
+      .sidebar-cta-card { padding: 18px; }
+
+      /* Footer */
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
     }
 
     /* ── FAQ accordion ── */
